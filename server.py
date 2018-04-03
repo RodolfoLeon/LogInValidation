@@ -48,7 +48,7 @@ def register():
             }
             query = "INSERT INTO users (first_name, last_name, email, password, created_at, updated_at) VALUES (:firstname, :lastname, :email, :password, NOW(), NOW())"
             mysql.query_db(query, data)
-            session['user_id']=
+            session['user_id'] = user[0]['id']
             return redirect ('/success')
 
     elif request.form['process'] == 'login':
@@ -56,18 +56,18 @@ def register():
         password = request.form['logpassword']
         if not EMAIL_REGEX.match(request.form['logemail']):
             flash('Please enter a correct email address.', 'error')
+            return redirect ('/')
         user_query = "SELECT * FROM users WHERE users.email = :email LIMIT 1"
         query_data = {'email': email}
         user = mysql.query_db(user_query, query_data)
         if len(user) != 0:
         encrypted_password = md5.new(password).hexdigest()
         if user[0]['password'] == encrypted_password:
-        # this means we have a successful login!
+            session['user_id'] = user[0]['id']
+            return redirect ('/')
         else:
-            # invalid password!
-        else:
-        # invalid email!
-        return redirect
+           flash('Incorrect username or password. Please enter correct information.')
+        return redirect ('/success')
 
 @app.route('/success')
 def success():
