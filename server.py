@@ -21,18 +21,22 @@ def index():
 def register():
     if request.form['process'] == 'register':
         valid = True
-        if len(request.form['first_name']) <2 and str.isalpha(request.form['first_name'] == False):
+        first = request.form['first_name']
+        last = request.form['last_name']
+        if len(request.form['first_name']) <2 and str.isalpha(first) == False:
             flash("Please enter your first name.", 'error')
             valid = False
-        elif len(request.form['last_name']) <2 and str.isalpha(request.form['first_name'] == False):
+        elif len(request.form['last_name']) <2 and str.isalpha(last) == False:
             flash("Please enter your last name.", 'error')
             valid = False
         elif not EMAIL_REGEX.match(request.form['email']):
             flash('Please enter a correct email address.', 'error')
             valid=False
+        # elif user_query = "SELECT * FROM users WHERE users.email = request.form['email'] LIMIT 1":
+            
         elif len(request.form['password']) < 8:
             flash('Password must be at least 8 characters long.', 'error')
-        elif not request.form('pwconfirm') == request.form('password'):
+        elif not request.form['pwconfirm'] == request.form['password']:
             flash("Incorrect confirmation for the password, please try again.", 'error')
             valid = False
 
@@ -48,6 +52,7 @@ def register():
             }
             query = "INSERT INTO users (first_name, last_name, email, password, created_at, updated_at) VALUES (:firstname, :lastname, :email, :password, NOW(), NOW())"
             mysql.query_db(query, data)
+            user = mysql.query_db(query, data)
             session['user_id'] = user[0]['id']
             return redirect ('/success')
 
@@ -61,13 +66,13 @@ def register():
         query_data = {'email': email}
         user = mysql.query_db(user_query, query_data)
         if len(user) != 0:
-        encrypted_password = md5.new(password).hexdigest()
+            encrypted_password = md5.new(password).hexdigest()
         if user[0]['password'] == encrypted_password:
             session['user_id'] = user[0]['id']
-            return redirect ('/')
+            return redirect ('/success')
         else:
            flash('Incorrect username or password. Please enter correct information.')
-        return redirect ('/success')
+        return redirect ('/')
 
 @app.route('/success')
 def success():
