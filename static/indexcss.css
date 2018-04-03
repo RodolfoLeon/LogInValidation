@@ -1,0 +1,9 @@
+#wrapper{
+    width: 900px;
+}
+
+.blocks{
+    width: 400px;
+    display: inline-block;
+    vertical-align: top;
+}
